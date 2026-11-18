@@ -1,20 +1,17 @@
-import os
+from fastapi import FastAPI
 
-from fastapi import FastAPI, HTTPException
-from sqlalchemy import create_engine, text
-from sqlalchemy.exc import SQLAlchemyError
-
-app = FastAPI(title="Ephemeral API", version="0.1.0")
-
-DATABASE_URL = os.environ["DATABASE_URL"]
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+from app.modules.health.infrastructure.inbound.controllers import health_controller
 
 
-@app.get("/health")
-def health() -> dict[str, str]:
-    try:
-        with engine.connect() as conn:
-            conn.execute(text("SELECT 1"))
-    except SQLAlchemyError as exc:
-        raise HTTPException(status_code=503, detail="Database unavailable") from exc
-    return {"status": "ok", "db": "ok"}
+def create_app() -> FastAPI:
+    application = FastAPI(
+        title="Ephemeral API",
+        version="0.1.0",
+    )
+
+    application.include_router(health_controller.router)
+
+    return application
+
+
+app = create_app()
