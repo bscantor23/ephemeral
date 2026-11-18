@@ -1,0 +1,30 @@
+# Secretos y entorno local
+.env
+*.pem
+*.key
+*.crt
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Python (server)
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Flutter / Dart (client)
+client/.dart_tool/
+client/.packages
+client/build/
+client/.flutter-plugins*
+client/pubspec.overrides.yaml
+
+# IDEs y editores
+.vscode/
+.idea/
