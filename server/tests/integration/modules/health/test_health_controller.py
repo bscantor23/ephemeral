@@ -42,3 +42,9 @@ def test_endpoint_failure():
         assert response.json() == {"detail": {"status": "degraded", "database": "unavailable"}}
     finally:
         app.dependency_overrides.clear()
+
+
+def test_endpoint_factory():
+    """Controlador: inyector por defecto inicializa caso de uso"""
+    use_case = get_check_health_use_case()
+    assert use_case is not None
