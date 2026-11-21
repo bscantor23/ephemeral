@@ -6,3 +6,4 @@ from app.modules.health.domain.value_objects.health_status_vo import HealthStatu
 class CheckHealthPort(Protocol):
     def execute(self) -> HealthStatusVO:
         ...
+

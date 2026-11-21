@@ -16,7 +16,9 @@ __pycache__/
 venv/
 .pytest_cache/
 .coverage
+*.cover
 htmlcov/
+coverage_html/
 
 # Flutter / Dart (client)
 client/.dart_tool/

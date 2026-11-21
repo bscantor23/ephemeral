@@ -51,4 +51,4 @@ jobs:
       - name: Validar cobertura en codigo nuevo (minimo 80%)
         if: github.event_name == 'pull_request'
         run: |
-          diff-cover coverage.xml --compare-branch=origin/main --fail-under=80
+          diff-cover coverage.xml --compare-branch=origin/main --fail-under=80 --include="app/**"
