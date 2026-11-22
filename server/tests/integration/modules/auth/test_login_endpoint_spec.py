@@ -18,11 +18,13 @@ from app.modules.auth.domain.value_objects.user_response_vo import UserResponseV
 from app.modules.auth.infrastructure.inbound.http.dependencies import (
     get_login_user_use_case,
 )
+from tests.helpers.crypto_fixtures import generate_client_identity
 
 
 class FakeLoginUseCase(LoginUserPort):
     def __init__(self, mode: str = "ok") -> None:
         self.mode = mode
+        self._keys = generate_client_identity()
 
     async def execute(self, request: LoginUserRequestVO) -> LoginUserResponseVO:
         if self.mode == "rate_limit":
@@ -33,9 +35,9 @@ class FakeLoginUseCase(LoginUserPort):
             id=uuid4(),
             username=request.username,
             display_name="User",
-            identity_sign_pub="sp",
-            identity_dh_pub="dp",
-            identity_dh_sig="ds",
+            identity_sign_pub=self._keys.identity_sign_pub,
+            identity_dh_pub=self._keys.identity_dh_pub,
+            identity_dh_sig=self._keys.identity_dh_sig,
             created_at=datetime.now(timezone.utc),
         )
         return LoginUserResponseVO(

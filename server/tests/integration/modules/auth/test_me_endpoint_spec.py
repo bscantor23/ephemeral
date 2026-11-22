@@ -10,17 +10,21 @@ from app.modules.auth.domain.value_objects.user_response_vo import UserResponseV
 from app.modules.auth.infrastructure.outbound.security.auth_security import (
     get_validate_token_use_case,
 )
+from tests.helpers.crypto_fixtures import generate_client_identity
 
 
 class FakeValidateTokenUseCase(ValidateTokenPort):
+    def __init__(self) -> None:
+        self._keys = generate_client_identity()
+
     def execute(self, raw_token: str) -> UserResponseVO:
         return UserResponseVO(
             id=uuid4(),
             username="eva",
             display_name="Eva",
-            identity_sign_pub="sp",
-            identity_dh_pub="dp",
-            identity_dh_sig="ds",
+            identity_sign_pub=self._keys.identity_sign_pub,
+            identity_dh_pub=self._keys.identity_dh_pub,
+            identity_dh_sig=self._keys.identity_dh_sig,
             created_at=datetime.now(timezone.utc),
         )
 

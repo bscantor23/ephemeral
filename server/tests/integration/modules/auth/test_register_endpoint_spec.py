@@ -12,6 +12,11 @@ from app.modules.auth.domain.value_objects.user_response_vo import UserResponseV
 from app.modules.auth.infrastructure.inbound.http.dependencies import (
     get_register_user_use_case,
 )
+from tests.helpers.crypto_fixtures import (
+    build_register_payload,
+    generate_client_identity,
+    verify_identity_signature,
+)
 
 
 class FakeRegisterUseCase(RegisterUserPort):
@@ -40,19 +45,40 @@ def test_register_endpoint_success():
     client = TestClient(app)
 
     try:
-        payload = {
-            "username": "eva_valid",
-            "display_name": "Eva",
-            "password": "Password123!",
-            "identity_sign_pub": "pub_sign",
-            "identity_dh_pub": "pub_dh",
-            "identity_dh_sig": "sig_dh",
-        }
+        payload = build_register_payload(username="eva_valid")
         res = client.post("/auth/register", json=payload)
         assert res.status_code == 201
         assert res.json()["username"] == "eva_valid"
     finally:
         app.dependency_overrides.clear()
+
+
+def test_register_endpoint_with_valid_crypto_keys():
+    """
+    ↳ POST /auth/register con claves P-256 criptográficamente válidas responde 201
+    """
+    keys = generate_client_identity()
+    app.dependency_overrides[get_register_user_use_case] = lambda: FakeRegisterUseCase()
+    client = TestClient(app)
+
+    try:
+        payload = build_register_payload(username="crypto_user", keys=keys)
+        res = client.post("/auth/register", json=payload)
+        assert res.status_code == 201
+        body = res.json()
+        assert body["identity_sign_pub"] == keys.identity_sign_pub
+        assert body["identity_dh_pub"] == keys.identity_dh_pub
+        assert body["identity_dh_sig"] == keys.identity_dh_sig
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_register_identity_signature_is_verifiable():
+    """
+    ↳ La firma identity_dh_sig generada por el cliente es verificable con identity_sign_pub
+    """
+    keys = generate_client_identity()
+    assert verify_identity_signature(keys) is True
 
 
 def test_register_endpoint_conflict():
@@ -65,14 +91,7 @@ def test_register_endpoint_conflict():
     client = TestClient(app)
 
     try:
-        payload = {
-            "username": "eva_valid",
-            "display_name": "Eva",
-            "password": "Password123!",
-            "identity_sign_pub": "pub_sign",
-            "identity_dh_pub": "pub_dh",
-            "identity_dh_sig": "sig_dh",
-        }
+        payload = build_register_payload(username="eva_valid")
         res = client.post("/auth/register", json=payload)
         assert res.status_code == 409
     finally:

@@ -14,6 +14,7 @@ __pycache__/
 *$py.class
 .venv/
 venv/
+.python-version
 .pytest_cache/
 .coverage
 *.cover
@@ -30,3 +31,8 @@ client/pubspec.overrides.yaml
 # IDEs y editores
 .vscode/
 .idea/
+
+# Documentacion local
+/docs/*
+/doc/*
+
