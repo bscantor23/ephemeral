@@ -1,0 +1,1 @@
+PREKEY_TTL_DAYS = 7

@@ -10,6 +10,11 @@ from app.modules.auth.domain.errors.auth_errors import (
     UserNotFoundError,
 )
 from app.modules.health.domain.errors.health_errors import ServiceUnavailableError
+from app.modules.keys.domain.errors.keys_errors import (
+    NoActivePrekeyError,
+    PrekeyExpiredError,
+    TargetUserNotFoundError,
+)
 
 
 def register_exception_handlers(app: FastAPI) -> None:
@@ -38,6 +43,15 @@ def register_exception_handlers(app: FastAPI) -> None:
     ) -> JSONResponse:
         return JSONResponse(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            content={"detail": str(exc)},
+        )
+
+    @app.exception_handler(TargetUserNotFoundError)
+    @app.exception_handler(NoActivePrekeyError)
+    @app.exception_handler(PrekeyExpiredError)
+    async def not_found_handler(request: Request, exc: Exception) -> JSONResponse:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
             content={"detail": str(exc)},
         )
 
