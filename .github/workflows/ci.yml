@@ -51,3 +51,8 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           uv run diff-cover coverage.xml --compare-branch=origin/main --fail-under=80 --include="app/**"
+
+      - name: Ejecutar simulaciones de ataque Red Team
+        run: |
+          uv run python ../attacks/attack_a1_swap_spk.py
+          uv run python ../attacks/attack_a2_swap_identity.py

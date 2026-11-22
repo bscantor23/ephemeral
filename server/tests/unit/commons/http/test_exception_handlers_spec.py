@@ -12,6 +12,11 @@ from app.modules.auth.domain.errors.auth_errors import (
     UserNotFoundError,
 )
 from app.modules.health.domain.errors.health_errors import ServiceUnavailableError
+from app.modules.keys.domain.errors.keys_errors import (
+    NoActivePrekeyError,
+    PrekeyExpiredError,
+    TargetUserNotFoundError,
+)
 
 
 @pytest.fixture
@@ -38,6 +43,18 @@ def client():
     @app.get("/test/session-expired")
     def raise_session_expired():
         raise SessionExpiredError("Session timed out")
+
+    @app.get("/test/target-user-not-found")
+    def raise_target_user_not_found():
+        raise TargetUserNotFoundError("Target user not found")
+
+    @app.get("/test/no-active-prekey")
+    def raise_no_active_prekey():
+        raise NoActivePrekeyError("No active prekey")
+
+    @app.get("/test/prekey-expired")
+    def raise_prekey_expired():
+        raise PrekeyExpiredError("Prekey expired")
 
     @app.get("/test/user-not-found")
     def raise_user_not_found():
@@ -97,6 +114,33 @@ def test_exception_handler_session_expired(client):
     res = client.get("/test/session-expired")
     assert res.status_code == 401
     assert res.json() == {"detail": "Session timed out"}
+
+
+def test_exception_handler_target_user_not_found(client):
+    """
+    ↳ Handlers: TargetUserNotFoundError mapea a HTTP 404
+    """
+    res = client.get("/test/target-user-not-found")
+    assert res.status_code == 404
+    assert res.json() == {"detail": "Target user not found"}
+
+
+def test_exception_handler_no_active_prekey(client):
+    """
+    ↳ Handlers: NoActivePrekeyError mapea a HTTP 404
+    """
+    res = client.get("/test/no-active-prekey")
+    assert res.status_code == 404
+    assert res.json() == {"detail": "No active prekey"}
+
+
+def test_exception_handler_prekey_expired(client):
+    """
+    ↳ Handlers: PrekeyExpiredError mapea a HTTP 404
+    """
+    res = client.get("/test/prekey-expired")
+    assert res.status_code == 404
+    assert res.json() == {"detail": "Prekey expired"}
 
 
 def test_exception_handler_user_not_found(client):
