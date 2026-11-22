@@ -14,9 +14,12 @@ __pycache__/
 *$py.class
 .venv/
 venv/
+.python-version
 .pytest_cache/
 .coverage
+*.cover
 htmlcov/
+coverage_html/
 
 # Flutter / Dart (client)
 client/.dart_tool/
@@ -28,3 +31,8 @@ client/pubspec.overrides.yaml
 # IDEs y editores
 .vscode/
 .idea/
+
+# Documentacion local
+/docs/*
+/doc/*
+

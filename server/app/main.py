@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 
-from app.modules.health.infrastructure.inbound.controllers import health_controller
+from app.commons.http.exception_handlers import register_exception_handlers
+from app.modules.auth.infrastructure.inbound.http.controllers import auth_controller
+from app.modules.health.infrastructure.inbound.http.controllers import health_controller
 
 
 def create_app() -> FastAPI:
@@ -9,7 +11,10 @@ def create_app() -> FastAPI:
         version="0.1.0",
     )
 
+    register_exception_handlers(application)
+
     application.include_router(health_controller.router)
+    application.include_router(auth_controller.router)
 
     return application
 
