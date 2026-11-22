@@ -4,6 +4,7 @@ from app.commons.http.exception_handlers import register_exception_handlers
 from app.modules.auth.infrastructure.inbound.http.controllers import auth_controller
 from app.modules.health.infrastructure.inbound.http.controllers import health_controller
 from app.modules.keys.infrastructure.inbound.http.controllers import keys_controller
+from app.modules.users.infrastructure.inbound.http.controllers import users_controller
 
 
 def create_app() -> FastAPI:
@@ -17,6 +18,7 @@ def create_app() -> FastAPI:
     application.include_router(health_controller.router)
     application.include_router(auth_controller.router)
     application.include_router(keys_controller.router)
+    application.include_router(users_controller.router, prefix="/users")
 
     return application
 

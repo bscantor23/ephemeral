@@ -15,6 +15,9 @@ from app.modules.keys.domain.errors.keys_errors import (
     PrekeyExpiredError,
     TargetUserNotFoundError,
 )
+from app.modules.users.domain.errors.users_errors import (
+    UserNotFoundError as UserDirectoryNotFoundError,
+)
 
 
 def register_exception_handlers(app: FastAPI) -> None:
@@ -49,6 +52,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(TargetUserNotFoundError)
     @app.exception_handler(NoActivePrekeyError)
     @app.exception_handler(PrekeyExpiredError)
+    @app.exception_handler(UserDirectoryNotFoundError)
     async def not_found_handler(request: Request, exc: Exception) -> JSONResponse:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,

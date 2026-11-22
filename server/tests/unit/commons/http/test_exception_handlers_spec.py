@@ -17,6 +17,9 @@ from app.modules.keys.domain.errors.keys_errors import (
     PrekeyExpiredError,
     TargetUserNotFoundError,
 )
+from app.modules.users.domain.errors.users_errors import (
+    UserNotFoundError as UserDirectoryNotFoundError,
+)
 
 
 @pytest.fixture
@@ -47,6 +50,10 @@ def client():
     @app.get("/test/target-user-not-found")
     def raise_target_user_not_found():
         raise TargetUserNotFoundError("Target user not found")
+
+    @app.get("/test/user-directory-not-found")
+    def raise_user_directory_not_found():
+        raise UserDirectoryNotFoundError("Directory contact not found")
 
     @app.get("/test/no-active-prekey")
     def raise_no_active_prekey():
@@ -123,6 +130,15 @@ def test_exception_handler_target_user_not_found(client):
     res = client.get("/test/target-user-not-found")
     assert res.status_code == 404
     assert res.json() == {"detail": "Target user not found"}
+
+
+def test_exception_handler_user_directory_not_found(client):
+    """
+    ↳ Handlers: UserDirectoryNotFoundError mapea a HTTP 404
+    """
+    res = client.get("/test/user-directory-not-found")
+    assert res.status_code == 404
+    assert res.json() == {"detail": "Directory contact not found"}
 
 
 def test_exception_handler_no_active_prekey(client):
