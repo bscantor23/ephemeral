@@ -1,11 +1,15 @@
 import os
 
-os.environ["APP_ENV"] = "test"
-os.environ["API_PORT"] = "8000"
-os.environ["POSTGRES_DB"] = "ephemeral_test"
-os.environ["POSTGRES_USER"] = "ephemeral_test"
-os.environ["POSTGRES_PASSWORD"] = "test_password"
-os.environ["DATABASE_URL"] = "postgresql+psycopg://test:test@localhost:5432/ephemeral_test"
+os.environ.setdefault("APP_ENV", "test")
+os.environ.setdefault("API_PORT", "8000")
+os.environ.setdefault("POSTGRES_DB", "ephemeral_test")
+os.environ.setdefault("POSTGRES_USER", "ephemeral_test")
+os.environ.setdefault("POSTGRES_PASSWORD", "test_insecure_local_only")
+os.environ.setdefault("ENABLE_PURGE_WORKER", "false")
+os.environ.setdefault(
+    "DATABASE_URL",
+    "postgresql+psycopg://ephemeral_test:test_insecure_local_only@localhost:5432/ephemeral_test",
+)
 
 
 def pytest_itemcollected(item):

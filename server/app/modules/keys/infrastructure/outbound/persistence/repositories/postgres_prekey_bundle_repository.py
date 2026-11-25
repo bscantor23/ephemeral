@@ -1,4 +1,5 @@
-from typing import Callable, Optional
+from collections.abc import Generator
+from typing import Callable, Optional, Tuple, Any
 from uuid import UUID
 
 from sqlalchemy import select, update
@@ -23,8 +24,23 @@ class PostgresPrekeyBundleRepository(PrekeyBundleRepositoryPort):
     ) -> None:
         self._session_factory = session_factory
 
+    def _get_session(self) -> Tuple[Optional[Generator], Session]:
+        res = self._session_factory()
+        if isinstance(res, Generator):
+            return res, next(res)
+        return None, res
+
+    def _close_session(self, gen, session) -> None:
+        if gen is not None:
+            try:
+                next(gen)
+            except StopIteration:
+                pass
+        else:
+            session.close()
+
     def save(self, bundle: PrekeyBundleEntity) -> PrekeyBundleEntity:
-        session = self._session_factory()
+        gen, session = self._get_session()
         try:
             schema = PrekeyBundleMapper.to_schema(bundle)
             session.add(schema)
@@ -32,10 +48,10 @@ class PostgresPrekeyBundleRepository(PrekeyBundleRepositoryPort):
             session.refresh(schema)
             return PrekeyBundleMapper.to_entity(schema)
         finally:
-            session.close()
+            self._close_session(gen, session)
 
     def get_active_by_user_id(self, user_id: UUID) -> Optional[PrekeyBundleEntity]:
-        session = self._session_factory()
+        gen, session = self._get_session()
         try:
             stmt = (
                 select(PrekeyBundleSchema)
@@ -50,10 +66,10 @@ class PostgresPrekeyBundleRepository(PrekeyBundleRepositoryPort):
                 return None
             return PrekeyBundleMapper.to_entity(schema)
         finally:
-            session.close()
+            self._close_session(gen, session)
 
     def deactivate_all_for_user(self, user_id: UUID) -> None:
-        session = self._session_factory()
+        gen, session = self._get_session()
         try:
             stmt = (
                 update(PrekeyBundleSchema)
@@ -66,4 +82,4 @@ class PostgresPrekeyBundleRepository(PrekeyBundleRepositoryPort):
             session.execute(stmt)
             session.commit()
         finally:
-            session.close()
+            self._close_session(gen, session)

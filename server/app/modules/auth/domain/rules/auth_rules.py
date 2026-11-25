@@ -22,5 +22,10 @@ class AuthRules:
             raise SessionExpiredError("Session has been revoked")
 
         now = datetime.now(timezone.utc)
-        if session.expires_at <= now:
+        expires_at = (
+            session.expires_at
+            if session.expires_at.tzinfo is not None
+            else session.expires_at.replace(tzinfo=timezone.utc)
+        )
+        if expires_at <= now:
             raise SessionExpiredError("Session has expired")

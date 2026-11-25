@@ -17,6 +17,11 @@ from app.modules.keys.domain.errors.keys_errors import (
     PrekeyExpiredError,
     TargetUserNotFoundError,
 )
+from app.modules.messages.domain.errors.messages_errors import (
+    MessageNotFoundError,
+    RecipientNotFoundError,
+    UnauthorizedMessageAckError,
+)
 from app.modules.users.domain.errors.users_errors import (
     UserNotFoundError as UserDirectoryNotFoundError,
 )
@@ -54,6 +59,18 @@ def client():
     @app.get("/test/user-directory-not-found")
     def raise_user_directory_not_found():
         raise UserDirectoryNotFoundError("Directory contact not found")
+
+    @app.get("/test/recipient-not-found")
+    def raise_recipient_not_found():
+        raise RecipientNotFoundError("Recipient not found")
+
+    @app.get("/test/message-not-found")
+    def raise_message_not_found():
+        raise MessageNotFoundError("Message not found")
+
+    @app.get("/test/unauthorized-message-ack")
+    def raise_unauthorized_message_ack():
+        raise UnauthorizedMessageAckError("Ack forbidden")
 
     @app.get("/test/no-active-prekey")
     def raise_no_active_prekey():
@@ -139,6 +156,33 @@ def test_exception_handler_user_directory_not_found(client):
     res = client.get("/test/user-directory-not-found")
     assert res.status_code == 404
     assert res.json() == {"detail": "Directory contact not found"}
+
+
+def test_exception_handler_recipient_not_found(client):
+    """
+    ↳ Handlers: RecipientNotFoundError mapea a HTTP 404
+    """
+    res = client.get("/test/recipient-not-found")
+    assert res.status_code == 404
+    assert res.json() == {"detail": "Recipient not found"}
+
+
+def test_exception_handler_message_not_found(client):
+    """
+    ↳ Handlers: MessageNotFoundError mapea a HTTP 404
+    """
+    res = client.get("/test/message-not-found")
+    assert res.status_code == 404
+    assert res.json() == {"detail": "Message not found"}
+
+
+def test_exception_handler_unauthorized_message_ack(client):
+    """
+    ↳ Handlers: UnauthorizedMessageAckError mapea a HTTP 403 Forbidden
+    """
+    res = client.get("/test/unauthorized-message-ack")
+    assert res.status_code == 403
+    assert res.json() == {"detail": "Ack forbidden"}
 
 
 def test_exception_handler_no_active_prekey(client):

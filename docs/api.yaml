@@ -1,0 +1,780 @@
+openapi: 3.1.0
+info:
+  title: Ephemeral API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      tags:
+      - Health
+      summary: Get Health
+      operationId: get_health_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponseDto'
+  /auth/register:
+    post:
+      tags:
+      - Auth
+      summary: Register
+      operationId: register_auth_register_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponseDto'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Login
+      operationId: login_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestDto'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponseDto'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/logout:
+    post:
+      tags:
+      - Auth
+      summary: Logout
+      operationId: logout_auth_logout_post
+      responses:
+        '204':
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+  /auth/me:
+    get:
+      tags:
+      - Auth
+      summary: Get Me
+      operationId: get_me_auth_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponseDto'
+      security:
+      - HTTPBearer: []
+  /keys/prekey:
+    post:
+      tags:
+      - Keys
+      summary: Upload Prekey
+      operationId: upload_prekey_keys_prekey_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadPrekeyRequestDto'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrekeyBundleResponseDto'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /keys/{user_id}/bundle:
+    get:
+      tags:
+      - Keys
+      summary: Get Public Bundle
+      operationId: get_public_bundle_keys__user_id__bundle_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicBundleResponseDto'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /users:
+    get:
+      tags:
+      - Users
+      summary: Listar usuarios del directorio
+      operationId: list_users_users_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Filtro de búsqueda por username o display_name
+          title: Search
+        description: Filtro de búsqueda por username o display_name
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Límite de resultados
+          default: 50
+          title: Limit
+        description: Límite de resultados
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          description: Desplazamiento para paginación
+          default: 0
+          title: Offset
+        description: Desplazamiento para paginación
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListUsersResponseDTO'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /users/by-username/{username}:
+    get:
+      tags:
+      - Users
+      summary: Buscar usuario por @username
+      operationId: get_user_by_username_users_by_username__username__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Username
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponseDTO'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /users/{user_id}:
+    get:
+      tags:
+      - Users
+      summary: Obtener perfil público por UUID
+      operationId: get_user_by_id_users__user_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponseDTO'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /messages:
+    post:
+      tags:
+      - Messages
+      summary: Enviar mensaje cifrado
+      operationId: send_message_messages_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequestDTO'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponseDTO'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /messages/pending:
+    get:
+      tags:
+      - Messages
+      summary: Recuperar mensajes diferidos pendientes
+      operationId: get_pending_messages_messages_pending_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 500
+          minimum: 1
+          default: 100
+          title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingMessagesResponseDTO'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /messages/{message_id}/ack:
+    post:
+      tags:
+      - Messages
+      summary: Confirmar acuse de recibo de entrega
+      operationId: acknowledge_message_messages__message_id__ack_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: message_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Message Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponseDTO'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    AuthTokenResponseDto:
+      properties:
+        access_token:
+          type: string
+          title: Access Token
+        token_type:
+          type: string
+          title: Token Type
+          default: bearer
+        expires_at:
+          type: string
+          format: date-time
+          title: Expires At
+        user:
+          $ref: '#/components/schemas/UserProfileResponseDto'
+      type: object
+      required:
+      - access_token
+      - expires_at
+      - user
+      title: AuthTokenResponseDto
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    HealthResponseDto:
+      properties:
+        status:
+          type: string
+          title: Status
+        database:
+          type: string
+          title: Database
+      type: object
+      required:
+      - status
+      - database
+      title: HealthResponseDto
+    ListUsersResponseDTO:
+      properties:
+        users:
+          items:
+            $ref: '#/components/schemas/UserProfileResponseDTO'
+          type: array
+          title: Users
+        total:
+          type: integer
+          title: Total
+        limit:
+          type: integer
+          title: Limit
+        offset:
+          type: integer
+          title: Offset
+      type: object
+      required:
+      - users
+      - total
+      - limit
+      - offset
+      title: ListUsersResponseDTO
+    LoginRequestDto:
+      properties:
+        username:
+          type: string
+          title: Username
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+      - username
+      - password
+      title: LoginRequestDto
+    MessageResponseDTO:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        chat_session_id:
+          type: string
+          format: uuid
+          title: Chat Session Id
+        sender_id:
+          type: string
+          format: uuid
+          title: Sender Id
+        recipient_id:
+          type: string
+          format: uuid
+          title: Recipient Id
+        protocol_version:
+          type: integer
+          title: Protocol Version
+        msg_num:
+          type: integer
+          title: Msg Num
+        ciphertext:
+          type: string
+          title: Ciphertext
+        ephemeral_pub:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ephemeral Pub
+        signed_prekey_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Signed Prekey Id
+        delivered_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Delivered At
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - chat_session_id
+      - sender_id
+      - recipient_id
+      - protocol_version
+      - msg_num
+      - ciphertext
+      - ephemeral_pub
+      - signed_prekey_id
+      - delivered_at
+      - created_at
+      title: MessageResponseDTO
+    PendingMessagesResponseDTO:
+      properties:
+        messages:
+          items:
+            $ref: '#/components/schemas/MessageResponseDTO'
+          type: array
+          title: Messages
+        count:
+          type: integer
+          title: Count
+      type: object
+      required:
+      - messages
+      - count
+      title: PendingMessagesResponseDTO
+    PrekeyBundleResponseDto:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        signed_prekey_pub:
+          type: string
+          title: Signed Prekey Pub
+        signature:
+          type: string
+          title: Signature
+        is_active:
+          type: boolean
+          title: Is Active
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        expires_at:
+          type: string
+          format: date-time
+          title: Expires At
+      type: object
+      required:
+      - id
+      - user_id
+      - signed_prekey_pub
+      - signature
+      - is_active
+      - created_at
+      - expires_at
+      title: PrekeyBundleResponseDto
+    PublicBundleResponseDto:
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        identity_sign_pub:
+          type: string
+          title: Identity Sign Pub
+        identity_dh_pub:
+          type: string
+          title: Identity Dh Pub
+        identity_dh_sig:
+          type: string
+          title: Identity Dh Sig
+        signed_prekey_id:
+          type: string
+          format: uuid
+          title: Signed Prekey Id
+        signed_prekey_pub:
+          type: string
+          title: Signed Prekey Pub
+        signature:
+          type: string
+          title: Signature
+        expires_at:
+          type: string
+          format: date-time
+          title: Expires At
+      type: object
+      required:
+      - user_id
+      - identity_sign_pub
+      - identity_dh_pub
+      - identity_dh_sig
+      - signed_prekey_id
+      - signed_prekey_pub
+      - signature
+      - expires_at
+      title: PublicBundleResponseDto
+    RegisterRequestDto:
+      properties:
+        username:
+          type: string
+          maxLength: 32
+          minLength: 3
+          title: Username
+        display_name:
+          type: string
+          maxLength: 64
+          title: Display Name
+          default: ''
+        password:
+          type: string
+          minLength: 8
+          title: Password
+        identity_sign_pub:
+          type: string
+          minLength: 1
+          title: Identity Sign Pub
+        identity_dh_pub:
+          type: string
+          minLength: 1
+          title: Identity Dh Pub
+        identity_dh_sig:
+          type: string
+          minLength: 1
+          title: Identity Dh Sig
+      type: object
+      required:
+      - username
+      - password
+      - identity_sign_pub
+      - identity_dh_pub
+      - identity_dh_sig
+      title: RegisterRequestDto
+    SendMessageRequestDTO:
+      properties:
+        recipient_id:
+          type: string
+          format: uuid
+          title: Recipient Id
+        chat_session_id:
+          type: string
+          format: uuid
+          title: Chat Session Id
+        msg_num:
+          type: integer
+          minimum: 0.0
+          title: Msg Num
+          description: Secuencia del ratchet de mensajes
+        ciphertext:
+          type: string
+          maxLength: 65536
+          minLength: 1
+          title: Ciphertext
+          description: Payload cifrado en AES-256-GCM
+        ephemeral_pub:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ephemeral Pub
+          description: Clave efímera ECDH para inicio X3DH
+        signed_prekey_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Signed Prekey Id
+          description: ID del bundle prekey utilizado
+        protocol_version:
+          type: integer
+          minimum: 1.0
+          title: Protocol Version
+          description: Versión del protocolo E2EE
+          default: 1
+      type: object
+      required:
+      - recipient_id
+      - chat_session_id
+      - msg_num
+      - ciphertext
+      title: SendMessageRequestDTO
+    UploadPrekeyRequestDto:
+      properties:
+        signed_prekey_pub:
+          type: string
+          minLength: 1
+          title: Signed Prekey Pub
+        signature:
+          type: string
+          minLength: 1
+          title: Signature
+      type: object
+      required:
+      - signed_prekey_pub
+      - signature
+      title: UploadPrekeyRequestDto
+    UserProfileResponseDTO:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        username:
+          type: string
+          title: Username
+        display_name:
+          type: string
+          title: Display Name
+        identity_sign_pub:
+          type: string
+          title: Identity Sign Pub
+        identity_dh_pub:
+          type: string
+          title: Identity Dh Pub
+        has_active_prekey:
+          type: boolean
+          title: Has Active Prekey
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - username
+      - display_name
+      - identity_sign_pub
+      - identity_dh_pub
+      - has_active_prekey
+      - created_at
+      title: UserProfileResponseDTO
+    UserProfileResponseDto:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        username:
+          type: string
+          title: Username
+        display_name:
+          type: string
+          title: Display Name
+        identity_sign_pub:
+          type: string
+          title: Identity Sign Pub
+        identity_dh_pub:
+          type: string
+          title: Identity Dh Pub
+        identity_dh_sig:
+          type: string
+          title: Identity Dh Sig
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - username
+      - display_name
+      - identity_sign_pub
+      - identity_dh_pub
+      - identity_dh_sig
+      - created_at
+      title: UserProfileResponseDto
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
