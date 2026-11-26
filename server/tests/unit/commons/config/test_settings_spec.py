@@ -13,8 +13,10 @@ def test_effective_database_url_constructed_when_none():
         POSTGRES_PASSWORD="secretpassword",
         POSTGRES_PORT=5432,
         DATABASE_URL=None,
+        ENABLE_PURGE_WORKER=True,
     )
     assert s.effective_database_url == "postgresql+psycopg://user:secretpassword@db:5432/ephemeral_db"
+    assert s.ENABLE_PURGE_WORKER is True
 
 
 def test_effective_database_url_returns_provided_url():
@@ -29,8 +31,10 @@ def test_effective_database_url_returns_provided_url():
         POSTGRES_USER="user",
         POSTGRES_PASSWORD="password",
         DATABASE_URL=url,
+        ENABLE_PURGE_WORKER=False,
     )
     assert s.effective_database_url == url
+    assert s.ENABLE_PURGE_WORKER is False
 
 
 def test_get_settings_cached_instance():
@@ -40,3 +44,5 @@ def test_get_settings_cached_instance():
     s1 = get_settings()
     s2 = get_settings()
     assert s1 is s2
+    assert s1.MESSAGE_RETENTION_MINUTES == 60
+    assert s1.PURGE_INTERVAL_SECONDS == 1800

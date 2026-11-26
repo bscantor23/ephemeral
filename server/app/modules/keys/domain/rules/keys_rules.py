@@ -11,5 +11,10 @@ class KeysRules:
     @staticmethod
     def validate_not_expired(expires_at: datetime) -> None:
         now = datetime.now(timezone.utc)
-        if expires_at <= now:
+        target = (
+            expires_at
+            if expires_at.tzinfo is not None
+            else expires_at.replace(tzinfo=timezone.utc)
+        )
+        if target <= now:
             raise PrekeyExpiredError("The requested prekey bundle has expired")

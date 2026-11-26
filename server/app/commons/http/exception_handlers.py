@@ -15,6 +15,11 @@ from app.modules.keys.domain.errors.keys_errors import (
     PrekeyExpiredError,
     TargetUserNotFoundError,
 )
+from app.modules.messages.domain.errors.messages_errors import (
+    MessageNotFoundError,
+    RecipientNotFoundError,
+    UnauthorizedMessageAckError,
+)
 from app.modules.users.domain.errors.users_errors import (
     UserNotFoundError as UserDirectoryNotFoundError,
 )
@@ -53,9 +58,20 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(NoActivePrekeyError)
     @app.exception_handler(PrekeyExpiredError)
     @app.exception_handler(UserDirectoryNotFoundError)
+    @app.exception_handler(RecipientNotFoundError)
+    @app.exception_handler(MessageNotFoundError)
     async def not_found_handler(request: Request, exc: Exception) -> JSONResponse:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
+            content={"detail": str(exc)},
+        )
+
+    @app.exception_handler(UnauthorizedMessageAckError)
+    async def forbidden_handler(
+        request: Request, exc: UnauthorizedMessageAckError
+    ) -> JSONResponse:
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
             content={"detail": str(exc)},
         )
 

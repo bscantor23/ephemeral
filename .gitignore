@@ -32,7 +32,6 @@ client/pubspec.overrides.yaml
 .vscode/
 .idea/
 
-# Documentacion local
-/docs/*
-/doc/*
+# Temporales locales
+.temp/
 

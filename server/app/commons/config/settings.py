@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     TOKEN_TTL_MINUTES: int = 60
     ARGON2_MAX_CONCURRENCY: int = 4
     LOGIN_RATE_LIMIT_PER_MIN: int = 5
+    ENABLE_PURGE_WORKER: bool
+    MESSAGE_RETENTION_MINUTES: int = 60
+    PURGE_INTERVAL_SECONDS: int = 1800
 
     @computed_field
     @property
