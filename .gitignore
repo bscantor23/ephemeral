@@ -32,3 +32,6 @@ client/pubspec.overrides.yaml
 .vscode/
 .idea/
 
+# Temporales locales
+.temp/
+
