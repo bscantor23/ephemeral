@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 from uuid import uuid4
 
 from app.modules.auth.domain.entities.user_entity import UserEntity
@@ -22,7 +23,7 @@ from app.modules.keys.domain.ports.prekey_bundle_repository_port import (
 
 
 class FakeUserRepo(UserRepositoryPort):
-    def __init__(self, user: UserEntity | None = None) -> None:
+    def __init__(self, user: Optional[UserEntity] = None) -> None:
         self.user = user
 
     def get_by_id(self, user_id):
@@ -38,7 +39,7 @@ class FakeUserRepo(UserRepositoryPort):
 
 
 class FakePrekeyRepo(PrekeyBundleRepositoryPort):
-    def __init__(self, bundle: PrekeyBundleEntity | None = None) -> None:
+    def __init__(self, bundle: Optional[PrekeyBundleEntity] = None) -> None:
         self.bundle = bundle
 
     def save(self, bundle):
