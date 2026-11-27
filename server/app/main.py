@@ -1,6 +1,7 @@
 import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.commons.config.settings import get_settings
 from app.commons.http.exception_handlers import register_exception_handlers
@@ -42,6 +43,17 @@ def create_app() -> FastAPI:
     )
 
     register_exception_handlers(application)
+
+    settings = get_settings()
+    cors_origins = getattr(settings, "parsed_cors_origins", ["*"])
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=cors_origins,
+        allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     application.include_router(health_controller.router)
     application.include_router(auth_controller.router)

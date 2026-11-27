@@ -27,6 +27,19 @@ class Settings(BaseSettings):
     ENABLE_PURGE_WORKER: bool
     MESSAGE_RETENTION_MINUTES: int = 60
     PURGE_INTERVAL_SECONDS: int = 1800
+    CORS_ORIGINS: str = (
+        "http://localhost:3000,http://127.0.0.1:3000,"
+        "http://localhost:8000,http://127.0.0.1:8000"
+    )
+
+    @computed_field
+    @property
+    def parsed_cors_origins(self) -> list[str]:
+        return [
+            origin.strip()
+            for origin in self.CORS_ORIGINS.split(",")
+            if origin.strip()
+        ]
 
     @computed_field
     @property

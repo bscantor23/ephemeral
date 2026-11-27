@@ -39,3 +39,25 @@ async def test_main_lifespan_worker_enabled():
             mock_purge.side_effect = _dummy_purge
             async with lifespan(app_mock):
                 pass
+
+
+def test_main_cors_preflight_allowed():
+    """
+    ↳ create_app: habilita middleware CORS y responde exitosamente a preflight OPTIONS
+    """
+    from fastapi.testclient import TestClient
+
+    application = create_app()
+    client = TestClient(application)
+
+    res = client.options(
+        "/health",
+        headers={
+            "Origin": "http://localhost:3000",
+            "Access-Control-Request-Method": "GET",
+            "Access-Control-Request-Headers": "Authorization",
+        },
+    )
+    assert res.status_code == 200
+    assert res.headers.get("access-control-allow-origin") == "http://localhost:3000"
+    assert res.headers.get("access-control-allow-credentials") == "true"
