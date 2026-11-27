@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Text, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Text, func, text
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -16,6 +16,7 @@ class PrekeyBundleSchema(Base):
             "user_id",
             unique=True,
             postgresql_where=(func.coalesce(func.cast("is_active", Boolean), True) == True),
+            sqlite_where=text("is_active = 1"),
         ),
     )
 

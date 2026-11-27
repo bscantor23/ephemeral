@@ -6,7 +6,7 @@ from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from app.commons.db.schemas.prekey_bundle_schema import PrekeyBundleSchema
-from app.commons.db.session import SessionLocal
+from app.commons.db.session import get_db_session
 from app.modules.keys.domain.entities.prekey_bundle_entity import (
     PrekeyBundleEntity,
 )
@@ -20,7 +20,8 @@ from app.modules.keys.infrastructure.outbound.persistence.mappers.prekey_bundle_
 
 class PostgresPrekeyBundleRepository(PrekeyBundleRepositoryPort):
     def __init__(
-        self, session_factory: Callable[[], Session] = SessionLocal
+        self,
+        session_factory: Callable[[], Generator[Session, None, None]] = get_db_session,
     ) -> None:
         self._session_factory = session_factory
 

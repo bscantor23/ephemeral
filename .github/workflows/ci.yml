@@ -56,3 +56,7 @@ jobs:
         run: |
           uv run python ../attacks/attack_a1_swap_spk.py
           uv run python ../attacks/attack_a2_swap_identity.py
+          uv run python ../attacks/attack_a3_tamper.py
+          uv run python ../attacks/attack_a4_replay.py
+          uv run python ../attacks/attack_a5_db_dump.py
+          uv run python ../attacks/attack_a6_forward_secrecy.py

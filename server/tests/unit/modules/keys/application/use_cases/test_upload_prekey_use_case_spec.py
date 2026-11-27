@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import uuid4
 
 from app.modules.keys.application.use_cases.upload_prekey_use_case import (
@@ -17,7 +18,7 @@ from app.modules.keys.domain.value_objects.upload_prekey_request_vo import (
 class FakePrekeyRepo(PrekeyBundleRepositoryPort):
     def __init__(self) -> None:
         self.deactivated_users: list = []
-        self.saved_bundle: PrekeyBundleEntity | None = None
+        self.saved_bundle: Optional[PrekeyBundleEntity] = None
 
     def save(self, bundle: PrekeyBundleEntity) -> PrekeyBundleEntity:
         self.saved_bundle = bundle
